@@ -1,0 +1,6 @@
+/* */
+
+/* thoe version ~ 100.1 */
+#define THOE_VERSION @VERSION_MAJOR@@VERSION_MINOR@.@VERSION_PATCH@
+
+
