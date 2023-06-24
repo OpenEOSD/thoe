@@ -4,15 +4,15 @@
 
 typedef std::string str_t;
 
-#define _eLog(eee) \
-  std::cerr << eee << "\n"
-#define _eRt(LIT, cstr) \
-  std::runtime_error(str_t(LIT" ;; ") + str_t(cstr))
-#define _eThrow(LIT,TIL) \
-  std::__throw_runtime_error(LIT " ;; " TIL)
+#define TH_Err(msg) \
+  std::cerr << msg << "\n"
+#define TH_Except(LIT, cstr) \
+  std::runtime_error(str_t(LIT" ;; ") + str_t(cstr)) 
+#define TH_Throw(msg) \
+  std::__throw_runtime_error(msg)
 
 #ifdef DEBUG
-# define _sLog(sss) std::cout << sss
+# define TH_Log(msg) std::cout << msg
 #else
-# define _sLog(sss) (void)sss
+# define TH_Log(msg) (void)msg
 #endif

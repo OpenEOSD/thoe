@@ -40,7 +40,8 @@ public:
 	bool isFullscreen() const { return m_fullscreen; };
 
 	void toggleFullscreen();
-	bool waitEvent(UIEvent &O);
+	bool waitEvent(UIEvent &);
+	void present();
 
 	auto createTexture(Uint32 format, int access, int w, int h) -> TH_Texture;
 	auto createTexture(TH_Image img) -> TH_Texture;

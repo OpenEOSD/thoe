@@ -26,5 +26,5 @@ public:
 	bool isFullscreen() const { return m_monic != NULL; };
 
 	void toggleFullscreen();
-	bool waitEvent(UIEvent &o);
+	bool waitEvent(UIEvent &);
 };
