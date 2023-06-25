@@ -3,9 +3,9 @@
 #include <getopt.h>
 
 #ifdef USE_GLFW
-# include "./ui/glfw.hpp"
+# include "ui/glfw.hpp"
 #else
-# include "./ui/sdl.hpp"
+# include "ui/sdl.hpp"
 #endif
 
 int main(int argc, const char *argv[]) {

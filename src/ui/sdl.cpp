@@ -1,5 +1,5 @@
 
-#include "./sdl.hpp"
+#include "sdl.hpp"
 
 /* UI Window constructor */
 UI_Window::UI_Window(const char *title, int x, int y, int w, int h, bool fullsc)

@@ -7,7 +7,7 @@
 # include <SDL2/SDL_mixer.h>
 #endif
 
-#include "./ui.hpp"
+#include "ui.hpp"
 
 typedef SDL_Texture* TH_Texture;
 typedef SDL_Surface* TH_Image;

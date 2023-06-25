@@ -4,7 +4,7 @@
 
 #endif
 
-#include "./ui.hpp"
+#include "ui.hpp"
 #include <list>
 
 typedef struct {

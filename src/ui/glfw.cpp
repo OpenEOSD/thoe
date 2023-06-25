@@ -1,5 +1,5 @@
 
-#include "./glfw.hpp"
+#include "glfw.hpp"
 
 template<typename List>
 static inline void handleEvent(GLFWwindow* win, List &evets)
