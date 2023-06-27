@@ -15,15 +15,16 @@ UI_Window::UI_Window(const char *title, int x, int y, int w, int h, bool fullsc)
 	if (x < 0 || y < 0)
 		x = y = SDL_WINDOWPOS_CENTERED;
 
-	TH_Log("open SDL window ..");
+	Sys_Log("open SDL window ..");
 	if ((m_win = SDL_CreateWindow(title, x, y, w, h, wf)))
 		m_rendr = SDL_CreateRenderer(m_win, -1, rf);
 
 	if (!m_win || !m_rendr) {
-		/* */ TH_Log(".fail\n");
-		throw TH_Except("ERR_SDL_WINDOW", SDL_GetError());
+		Sys_Log(".fail\n");
+		Sys_Err("ERR_SDL_WINDOW" << SDL_GetError());
+		Sys_ExitFail();
 	}
-	TH_Log(".ok \n");
+	Sys_Log(".ok \n");
 }
 
 /* UI Window destructor */
@@ -33,8 +34,7 @@ UI_Window::~UI_Window() {
 #endif
 	SDL_DestroyRenderer(m_rendr);
 	SDL_DestroyWindow(m_win);
-
-	TH_Log("SDL window close \n");
+	Sys_Log("SDL window close \n");
 }
 
 void UI_Window::toggleFullscreen()
@@ -42,7 +42,7 @@ void UI_Window::toggleFullscreen()
 	Uint32 wf = m_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP;
 	
 	if (SDL_SetWindowFullscreen(m_win, wf)) {
-		TH_Err("can't set SDL window mode: " << SDL_GetError());
+		Sys_Err("can't set SDL window mode: " << SDL_GetError());
 	} else {
 		m_fullscreen = (wf != 0);
 	}
@@ -75,7 +75,7 @@ bool UI_Window::waitEvent(UIEvent &o)
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 			case SDL_WINDOWEVENT_MAXIMIZED:
 			case SDL_WINDOWEVENT_MINIMIZED:
-				TH_Err("win@" << e.window.windowID << " size: " << "x" << "\n");
+				Sys_Err("win@" << e.window.windowID << " size: " << "x" << "\n");
 				break;
 			}
 		}
@@ -87,7 +87,8 @@ auto UI_Window::createTexture(Uint32 format, int access, int w, int h) -> TH_Tex
 {
 	TH_Texture tex = SDL_CreateTexture(m_rendr, format, access, w, h);
 	if(NULL == tex) {
-		throw TH_Except("ERR_SDL_TEXTURE", SDL_GetError());
+		Sys_Err("ERR_SDL_TEXTURE" << SDL_GetError());
+		Sys_ExitFail();
 	}
 	return tex;
 }
@@ -96,14 +97,15 @@ auto UI_Window::createTexture(TH_Image img) -> TH_Texture
 {
 	TH_Texture tex = SDL_CreateTextureFromSurface(m_rendr, img);
 	if(NULL == tex) {
-		throw TH_Except("ERR_SDL_TEXTURE", SDL_GetError());
+		Sys_Err("ERR_SDL_TEXTURE" << SDL_GetError());
+		Sys_ExitFail();
 	}
 	return tex;
 }
 
 UI_Init::UI_Init(uint32_t audio_formats)
 {
-	TH_Log("init SDL ..");
+	Sys_Log("init SDL ..");
 
 	if (0 > SDL_Init(
 	    SDL_INIT_VIDEO | SDL_INIT_TIMER
@@ -111,14 +113,15 @@ UI_Init::UI_Init(uint32_t audio_formats)
 	  | SDL_INIT_AUDIO
 #endif
 	) || TTF_Init() == -1 || IMG_Init(IMG_INIT_PNG) == 0) {
-		/* */ TH_Log(".fail\n");
-		throw TH_Except("ERR_SDL_INIT", SDL_GetError());
+		Sys_Log(".fail\n");
+		Sys_Err("ERR_SDL_INIT" << SDL_GetError());
+		Sys_ExitFail();
 	}
 #ifndef NO_SOUND
 	m_formats = Mix_Init( audio_formats );
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 #endif
-	TH_Log(".ok\n");
+	Sys_Log(".ok\n");
 }
 
 UI_Init::~UI_Init()
@@ -130,6 +133,5 @@ UI_Init::~UI_Init()
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
-
-	TH_Log("SDL quit \n");
+	Sys_Log("SDL quit \n");
 }

@@ -24,7 +24,7 @@ UI_Window::UI_Window(const char *title, int x, int y, int w, int h, bool fullsc)
 {
 	bool cpos = (x < 0 || y < 0);
 
-	TH_Log("open GLFW window ..");
+	Sys_Log("open GLFW window ..");
 	m_monic = fullsc || cpos ? glfwGetPrimaryMonitor() : NULL;
 
 	if (!fullsc && cpos) {
@@ -42,13 +42,13 @@ UI_Window::UI_Window(const char *title, int x, int y, int w, int h, bool fullsc)
 		glfwShowWindow(m_win);
 	}
 	handleEvent(m_win, m_events);
-	TH_Log(".ok\n");
+	Sys_Log(".ok\n");
 };
 
 /* UI Window destructor */
 UI_Window::~UI_Window() {
 	glfwDestroyWindow(m_win);
-   TH_Log("GLFW window closed\n");
+   Sys_Log("GLFW window closed\n");
 };
 
 void UI_Window::toggleFullscreen()
@@ -80,16 +80,17 @@ bool UI_Window::waitEvent(UIEvent &o)
 
 UI_Init::UI_Init(uint32_t audio_formats)
 {
-	TH_Log("init GLFW ..");
+	Sys_Log("init GLFW ..");
 	if (glfwInit() == GLFW_FALSE) {
-		TH_Log(".fail\n");
-		TH_Throw("ERR_GLFW_INIT");
+		Sys_Log(".fail\n");
+		Sys_Err("ERR_GLFW_INIT");
+		Sys_ExitFail();
 	}
-	TH_Log(".ok\n");
+	Sys_Log(".ok\n");
 }
 
 UI_Init::~UI_Init()
 {
 	glfwTerminate();
-	TH_Log("GLFW terminated\n");
+	Sys_Log("GLFW terminated\n");
 }

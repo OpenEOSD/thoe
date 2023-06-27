@@ -1,6 +1,8 @@
 
-#include <iostream>
-#include <getopt.h>
+#include "thtk/contrib/thtkpp.hh"
+
+#include "sys/ospath.hpp"
+#include "sys/oserror.hpp"
 
 #ifdef USE_GLFW
 # include "ui/glfw.hpp"

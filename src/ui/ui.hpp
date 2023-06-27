@@ -1,5 +1,5 @@
 
-#include "../etypes.hpp"
+#include "../sys/oserror.hpp"
 
 #define KEY_STATE_SHOOT 0x01
 #define KEY_STATE_BOMB  0x02
