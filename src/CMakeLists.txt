@@ -52,6 +52,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thtk)
 add_subdirectory(thtk)
 #step 1: create config.h
 configure_file(config.h.in config.h)
+add_definitions(-include config.h)
 #step 2: add source files
 add_executable(thoe ${thoe_source})
 #step 3: add include files
