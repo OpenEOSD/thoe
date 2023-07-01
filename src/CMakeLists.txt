@@ -15,9 +15,6 @@ if(USE_GLFW)
   set(thoe_extra_lib
     ${thoe_extra_lib} glfw
   )
-  set(thoe_source
-    ${thoe_source} ui/glfw.cpp
-  )
   set(thoe_extra_h
     ${thoe_extra_h} ${GLFW3_INCLUDE_DIRS}
   )
@@ -30,9 +27,6 @@ else()
     SDL2_image
     SDL2_mixer
     SDL2_ttf
-  )
-  set(thoe_source
-    ${thoe_source} ui/sdl.cpp
   )
   set(thoe_extra_lib
     ${thoe_extra_lib}

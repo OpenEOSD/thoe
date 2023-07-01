@@ -26,14 +26,14 @@ typedef struct {
 	int vals[4];
 } UIEvent;
 
-class UI_Init {
+class UI_Background {
 
 private:
 	uint32_t m_formats;
 
 public:
-	 UI_Init(uint32_t audio_formats);
-	~UI_Init();
+	 UI_Background(uint32_t audio_formats);
+	~UI_Background();
 
 	bool hasFormatSupport(uint32_t format) const {
 		return (m_formats & format) == format;

@@ -7,6 +7,12 @@
 # include <SDL2/SDL_mixer.h>
 #endif
 
+/* files load intarface */
+#define LOAD_IMG_RAW(buf) \
+        IMG_Load_RW(SDL_RWFromConstMem(buf.data(), buf.size()),0)
+#define LOAD_IMG_FILE(path) \
+        IMG_Load(path.c_str())
+
 #include "ui.hpp"
 
 typedef SDL_Texture* TH_Texture;
@@ -23,7 +29,6 @@ typedef SDL_Rect     TH_Rect;
 
 class UI_Window {
 
-private:
 	SDL_Window   *m_win;
 	SDL_Renderer *m_rendr;
 	bool m_fullscreen;
@@ -41,8 +46,19 @@ public:
 
 	void toggleFullscreen();
 	bool waitEvent(UIEvent &);
-	void present();
+	void pushEvent(UIEvent);
 
 	auto createTexture(Uint32 format, int access, int w, int h) -> TH_Texture;
 	auto createTexture(TH_Image img) -> TH_Texture;
+
+	void render(TH_Texture);
+	void render(TH_Image);
+
+	void present() {
+#ifdef WITH_OPENGL
+		SDL_GL_SwapWindow(m_win);
+#else
+		SDL_RenderPresent(m_rendr);
+#endif
+	};
 };

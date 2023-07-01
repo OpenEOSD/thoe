@@ -24,6 +24,9 @@ UI_Window::UI_Window(const char *title, int x, int y, int w, int h, bool fullsc)
 		Sys_Err("ERR_SDL_WINDOW" << SDL_GetError());
 		Sys_ExitFail();
 	}
+	if (SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY , "linear" ) &&
+	    SDL_RenderSetLogicalSize( m_rendr, w, h ))
+	    Sys_Err("can't set logical scale" << SDL_GetError());
 	Sys_Log(".ok \n");
 }
 
@@ -48,12 +51,17 @@ void UI_Window::toggleFullscreen()
 	}
 }
 
-void UI_Window::present() {
-#ifdef WITH_OPENGL
-	SDL_GL_SwapWindow(m_win);
-#else
-	SDL_RenderPresent(m_rendr);
-#endif
+void UI_Window::render(TH_Texture tex) {
+	if (SDL_RenderCopy( m_rendr, tex, NULL, NULL)) {
+		Sys_Err("ERR_SDL_RENDER" << SDL_GetError());
+		Sys_ExitFail();
+	}
+}
+void UI_Window::render(TH_Image img) {
+	if (SDL_RenderCopy( m_rendr, createTexture(img), NULL, NULL)) {
+		Sys_Err("ERR_SDL_RENDER" << SDL_GetError());
+		Sys_ExitFail();
+	}
 }
 
 bool UI_Window::waitEvent(UIEvent &o)
@@ -73,6 +81,8 @@ bool UI_Window::waitEvent(UIEvent &o)
 		case SDL_WINDOWEVENT:
 			switch(e.window.event) {
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
+				o.type = UI_RESIZE;
+				break;
 			case SDL_WINDOWEVENT_MAXIMIZED:
 			case SDL_WINDOWEVENT_MINIMIZED:
 				Sys_Err("win@" << e.window.windowID << " size: " << "x" << "\n");
@@ -82,6 +92,15 @@ bool UI_Window::waitEvent(UIEvent &o)
 	}
 	return hasNew;
 }
+
+void UI_Window::pushEvent(UIEvent e) {
+	SDL_Event evt = {
+		.type = SDL_USEREVENT
+	};
+	evt.user.type  = e.type;
+	evt.user.data1 = e.vals;
+	SDL_PushEvent(&evt);
+};
 
 auto UI_Window::createTexture(Uint32 format, int access, int w, int h) -> TH_Texture
 {
@@ -103,7 +122,7 @@ auto UI_Window::createTexture(TH_Image img) -> TH_Texture
 	return tex;
 }
 
-UI_Init::UI_Init(uint32_t audio_formats)
+UI_Background::UI_Background(uint32_t audio_formats)
 {
 	Sys_Log("init SDL ..");
 
@@ -112,7 +131,7 @@ UI_Init::UI_Init(uint32_t audio_formats)
 #ifndef NO_SOUND
 	  | SDL_INIT_AUDIO
 #endif
-	) || TTF_Init() == -1 || IMG_Init(IMG_INIT_PNG) == 0) {
+	) || TTF_Init() == -1 || IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) == 0) {
 		Sys_Log(".fail\n");
 		Sys_Err("ERR_SDL_INIT" << SDL_GetError());
 		Sys_ExitFail();
@@ -124,7 +143,7 @@ UI_Init::UI_Init(uint32_t audio_formats)
 	Sys_Log(".ok\n");
 }
 
-UI_Init::~UI_Init()
+UI_Background::~UI_Background()
 {
 #ifndef NO_SOUND
 	Mix_CloseAudio();

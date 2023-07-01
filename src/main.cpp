@@ -6,31 +6,33 @@
 #define THOE_VERSION_FULL "0.01"
 #endif
 
-#include "thtk/contrib/thtkpp.hh"
-
 #include "sys/ospath.hpp"
-#include "sys/oserror.hpp"
+
+#ifndef WITH_THTK
+#include "dat/thtk_bitstream.cpp"
+#endif
 
 #include "daiopts.cpp"
 
 #ifdef USE_GLFW
-# include "ui/glfw.hpp"
+# include "ui/glfw.cpp"
 #else
-# include "ui/sdl.hpp"
+# include "ui/sdl.cpp"
 #endif
 
 const char help_text[] = "\n"
-"    -d      Game Directory\n"
-"    -c      Config Directory\n"
-"    -v      Print Version\n"
-"    -h      Print Help\n";
+"  -d=<path>  Game Directory\n"
+"  -u         Unpacked Game Resources\n"
+"  -c=<path>  Config Directory\n"
+"  -v         Print Version\n"
+"  -h         Print Help\n";
 
 int main(int argc, const char *argv[]) {
 
 	bool go_exit = false;
 	int e_status = EXIT_SUCCESS;
 
-	DaiOpts opts({'d', 'c', 'v', 'h'});
+	DaiOpts opts({'d', 'u', 'c', 'v', 'h'});
 	/*...*/ opts.parse(argc, argv);
 
 	if (opts.has_option('v')) {
@@ -50,15 +52,55 @@ int main(int argc, const char *argv[]) {
 	if (go_exit)
 		return e_status;
 
-	UI_Init ui = UI_Init(0);
-	UI_Window win = UI_Window("Touhou", -1,-1, 800, 600, false);
+	str_t TH_dir, TH_title = "Touhou";
+
+	if (opts.has_option('d'))
+	{
+		/**/TH_dir = opts.get_value('d');
+		if (IS_PATH_NOT_ABSOLUTE(TH_dir)) {
+			Sys_Err("Error parse option:\n\t-d=\"" << TH_dir << "\"\n"
+			     << "\nShell path's is not supported."
+			     << "\nPlease set full path of the game.\n");
+			return EXIT_FAILURE;
+		} else
+		if (TH_dir.at(TH_dir.size()-1) != OS_PATH_S)
+			TH_dir += std::to_string(OS_PATH_S);
+	} else {
+		Sys_Err("\nError: Unable to find game directory."
+		     << "\nUse -d option for set full path of the game.");
+		return EXIT_FAILURE;
+	}
+
+	str_t TL_path = TH_dir + str_t("TL.DAT"),
+	      ST_path = TH_dir + str_t("ST.DAT"),
+	      IN_path = TH_dir + str_t("IN.DAT");
+
+	TH_Dat TL_data(TL_path.c_str());
+	uint32_t TH_ver = TL_data.version();
+
+	if (TH_ver)
+		TH_title += " "+ std::to_string(TH_ver);
+
+	TH_Entry TL_ent = TL_data.entry("title00.jpg");
+	U8ClampVec title00 = TL_ent.extract();
+
+	std::cout << "detect Touhou " << TH_ver  << std::endl;
+	std::cout << "TL.DAT entries: " << TL_data.entry_count()<< std::endl;
+	std::cout << "title00.jpg size: " << TL_ent.size() << std::endl;
+
+	UI_Background bg(0);
+	UI_Window win(TH_title.c_str(), -1,-1, 800, 600, false);
 	UIEvent e;
+
+	TH_Image sp = LOAD_IMG_RAW(title00);
+	TH_Texture tx = win.createTexture(sp);
+					win.render(tx);
+					win.present();
 
 	do {
 		if (win.waitEvent(e)) {
 			switch(e.type) {
 			case UI_ERROR:
-				std::cout << "error: " << e.vals[1] << "\n";
 				e_status = EXIT_FAILURE;
 			case UI_EXIT:
 				go_exit = true;
@@ -67,8 +109,10 @@ int main(int argc, const char *argv[]) {
 				std::cout << "key: " << e.vals[1] << "\n";
 				break;
 			case UI_PAUSE:
-			case UI_RESIZE:
 				break;
+			case UI_RESIZE:
+				win.render(tx);
+				win.present();
 			}
 		}
 	} while (!go_exit);

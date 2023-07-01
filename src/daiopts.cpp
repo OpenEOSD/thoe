@@ -1,10 +1,8 @@
-#include <vector>
-#include <string>
+#include "sattypes.hpp"
 #include <regex>
 #include <map>
 
-typedef std::string str_t;
-typedef const char  key_c;
+typedef const char key_c;
 
 /*
   A minimal interface for parsing command line arguments

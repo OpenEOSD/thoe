@@ -1,13 +1,15 @@
 #ifndef __OS_PATH__
 # define __OS_PATH__
 
-# include <string>
+# include "../sattypes.hpp"
 
 # ifdef _WIN32
 	#include <windows.h>
 	#include <shlobj.h>
 	#define OS_PATH_S '\\'
 	#define OS_PATH_L MAX_PATH
+	#define IS_PATH_NOT_ABSOLUTE(p) \
+		(p.at(1) != ':' || p.at(2) != OS_PATH_S || p.at(3) != OS_PATH_S)
 # else
 	#ifdef __APPLE__
 		#include <mach-o/dyld.h>
@@ -19,13 +21,12 @@
 	#include <pwd.h>
 	#define OS_PATH_S '/'
 	#define OS_PATH_L 1024
+	#define IS_PATH_NOT_ABSOLUTE(p) (p.at(0) != OS_PATH_S)
 # endif
-
-typedef std::string str_t;
 
 #endif //__OS_PATH__
 
-static inline str_t SysRealExecPath(const char *argv0) {
+static inline str_t SysRealExecPath() {
 
 	char out_dir[ OS_PATH_L ];
 	ssize_t cnt = OS_PATH_L;

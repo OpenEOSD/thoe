@@ -7,15 +7,15 @@ static inline void handleEvent(GLFWwindow* win, List &evets)
 	glfwSetWindowUserPointer(win, &evets);
 	glfwSetFramebufferSizeCallback(win, [](GLFWwindow* win, int w, int h) {
 		List *evets = (List *)glfwGetWindowUserPointer(win);
-		evets->push_back(UIEvent{UI_RESIZE,-1,-1,w,h});
+		evets->push_front(UIEvent{UI_RESIZE,-1,-1,w,h});
 	});
 	glfwSetWindowCloseCallback(win, [](GLFWwindow* win) {
 		List *evets = (List *)glfwGetWindowUserPointer(win);
-		evets->push_back(UIEvent{UI_EXIT,0,0,0,0});
+		evets->push_front(UIEvent{UI_EXIT,0,0,0,0});
 	});
 	glfwSetKeyCallback(win, [](GLFWwindow*win, int key, int scancode, int action, int mods) {
 		List *evets = (List *)glfwGetWindowUserPointer(win);
-		evets->push_back(UIEvent{UI_INPUT, key, scancode, action, mods});
+		evets->push_front(UIEvent{UI_INPUT, key, scancode, action, mods});
 	});
 }
 
@@ -78,7 +78,7 @@ bool UI_Window::waitEvent(UIEvent &o)
 	return hasNew;
 }
 
-UI_Init::UI_Init(uint32_t audio_formats)
+UI_Background::UI_Background(uint32_t audio_formats)
 {
 	Sys_Log("init GLFW ..");
 	if (glfwInit() == GLFW_FALSE) {
@@ -89,7 +89,7 @@ UI_Init::UI_Init(uint32_t audio_formats)
 	Sys_Log(".ok\n");
 }
 
-UI_Init::~UI_Init()
+UI_Background::~UI_Background()
 {
 	glfwTerminate();
 	Sys_Log("GLFW terminated\n");
